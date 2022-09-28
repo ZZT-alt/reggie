@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zztqvq.mapper.DishMapper">
+
+    <!--    <select id="selectPage" resultType="com.zztqvq.dto.DishDto">-->
+
+    <!--    </select>-->
+    <select id="selectByPage" resultType="com.zztqvq.dto.DishDto">
+        select *
+        from reggie.dish as d ,reggie.category as c
+        <where>
+            <if test="name != null and name !='' ">
+                d.name like #{name} and
+            </if>
+            d.category_id = c.id
+        </where>
+        limit #{page},#{pageSize}
+    </select>
+</mapper>

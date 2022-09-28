@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <properties resource="mysql.properties"/>
+
+    <!--    自定义别名-->
+    <typeAliases>
+        <package name="com.zztqvq.entity"/>
+    </typeAliases>
+
+    <!--    注册类型处理器-->
+    <!--    <typeHandlers>-->
+    <!--        <typeHandler handler="com.ZZT.handler.DateTypeHandler"/>-->
+    <!--    </typeHandlers>-->
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="url" value="${url}"/>
+                <property name="driver" value="${driver}"/>
+                <property name="username" value="${user}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <!--        加载sql的映射文件-->
+        <!--        <mapper resource="com/ZZT/mapper/jdbc_mapper.xml"/>-->
+        <package name="com.zztqvq.mapper"/>
+    </mappers>
+</configuration>

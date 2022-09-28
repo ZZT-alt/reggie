@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zztqvq.mapper.EmailUserMapper">
+
+    <insert id="register">
+        insert into reggie.email_user (id, username, sex, email, id_number, avatar, password, code)
+        values (#{u.id},#{u.username},#{u.sex},#{u.email},#{u.idNumber},#{u.avatar},#{u.password},#{u.code})
+    </insert>
+</mapper>
