@@ -19,6 +19,8 @@ spring:
         max-wait: 1ms
         max-idle: 8
         min-idle: 0
+    host: 192.168.218.128
+    password: root@root
 mybatis-plus:
   configuration:
     #TODO 在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
