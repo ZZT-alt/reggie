@@ -45,7 +45,7 @@ public class UserController {
             log.info("code => " + code);
 //            session.setAttribute(user.getPhone(), code);
             //将验证码缓存到redis中，并且设置有效期
-            redisTemplate.opsForValue().set(user.getPhone(), code, 2, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(user.getPhone(), code, 20, TimeUnit.SECONDS);
             return R.success("发送成功" + code);
         }
         return R.error("短信发送失败");

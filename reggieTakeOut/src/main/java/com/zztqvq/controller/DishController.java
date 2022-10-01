@@ -14,10 +14,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RestController
@@ -33,11 +38,17 @@ public class DishController {
     @Autowired
     private DishFlavorService dishFlavorService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private CacheManager cacheManager;
+
     /**
      * TODO 分页查询所以菜品
      *
-     * @param page
-     * @param pageSize
+     * @param page     当前页
+     * @param pageSize 每页数据条数
      * @param name
      * @return Success
      */
@@ -71,10 +82,19 @@ public class DishController {
     }
 
     @GetMapping("/list")
-    public R<List<DishDto>> getList(Long categoryId, String name,Integer status) {
+    public R<List<DishDto>> getList(Long categoryId, String name, Integer status) {
+        //先从redis中获取数据
+        List<DishDto> dishDtos;
+        String key = "dish" + "_" + categoryId + "_" + status;
+        dishDtos = (List<DishDto>) redisTemplate.opsForValue().get(key);
+        if (dishDtos != null) {
+            return R.success(dishDtos);
+        }
+        else {
+            dishDtos = new ArrayList<>();
+        }
         LambdaQueryWrapper<Dish> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Dish::getStatus, 1);
-        List<DishDto> dishDtos = new ArrayList<>();
         if (name == null) {
             wrapper.eq(Dish::getCategoryId, categoryId);
             List<Dish> dishList = dishService.list(wrapper);
@@ -98,6 +118,7 @@ public class DishController {
                 dishDtos.add(dishDto);
             }
         }
+        redisTemplate.opsForValue().set(key, dishDtos, 1, TimeUnit.HOURS);
         return R.success(dishDtos);
     }
 //    @GetMapping("/list")
@@ -123,6 +144,7 @@ public class DishController {
      * @param dishDto
      * @return Success
      */
+    @CachePut(value = "dishCache",key = "#dishDto.id")
     @PostMapping
     public R<String> save(@RequestBody DishDto dishDto) {
         log.info(dishDto.toString());
@@ -151,6 +173,8 @@ public class DishController {
     @PutMapping
     public R<String> update(@RequestBody DishDto dishDto) {
         dishService.updateWithFlavor(dishDto);
+        String key = "dish" + "_" + dishDto.getCategoryId() + "_" + dishDto.getStatus();
+        redisTemplate.delete(key);
         return R.success("更新成功");
     }
 
